@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'signup_screen.dart';
-import 'home_screen.dart';
+import 'home_screen_new.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,9 +34,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (success && mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreenNew()),
         );
       }
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.signInWithGoogle();
+
+    if (success && mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreenNew()),
+      );
     }
   }
 
@@ -177,6 +188,34 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Google Sign-In Button
+                Consumer<AuthProvider>(
+                  builder: (context, authProvider, child) {
+                    return OutlinedButton.icon(
+                      onPressed: authProvider.isLoading
+                          ? null
+                          : _signInWithGoogle,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: const BorderSide(color: Colors.grey),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.g_mobiledata,
+                        color: Colors.red,
+                        size: 24,
+                      ),
+                      label: Text(
+                        'Sign in with Google',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                      ),
                     );
                   },
                 ),

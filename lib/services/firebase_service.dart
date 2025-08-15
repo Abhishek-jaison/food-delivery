@@ -41,6 +41,15 @@ class FirebaseService {
     }
   }
 
+  // Sign in with credential (for Google Sign-In)
+  Future<UserCredential> signInWithCredential(AuthCredential credential) async {
+    try {
+      return await _auth.signInWithCredential(credential);
+    } catch (e) {
+      throw _handleAuthError(e);
+    }
+  }
+
   // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
@@ -76,12 +85,14 @@ class FirebaseService {
     required String email,
     String? displayName,
     String? phoneNumber,
+    String? photoURL,
   }) async {
     try {
       await _firestore.collection('users').doc(uid).set({
         'email': email,
         'displayName': displayName,
         'phoneNumber': phoneNumber,
+        'photoURL': photoURL,
         'createdAt': FieldValue.serverTimestamp(),
         'lastLogin': FieldValue.serverTimestamp(),
       });

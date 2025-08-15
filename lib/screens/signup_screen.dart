@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import 'home_screen.dart';
+import 'home_screen_new.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -12,19 +12,19 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _displayNameController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _displayNameController.dispose();
     super.dispose();
   }
 
@@ -34,12 +34,12 @@ class _SignupScreenState extends State<SignupScreen> {
       final success = await authProvider.signUp(
         _emailController.text.trim(),
         _passwordController.text,
-        displayName: _displayNameController.text.trim(),
+        displayName: _fullNameController.text.trim(),
       );
 
       if (success && mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreenNew()),
         );
       }
     }
@@ -80,7 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   // Display Name Field
                   TextFormField(
-                    controller: _displayNameController,
+                    controller: _fullNameController,
                     decoration: const InputDecoration(
                       labelText: 'Full Name',
                       hintText: 'Enter your full name',
