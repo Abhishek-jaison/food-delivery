@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'providers/auth_provider.dart';
 import 'providers/home_data_provider.dart';
 import 'services/hive_service.dart';
+import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen_new.dart';
 
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
               useMaterial3: true,
             ),
-            home: const AuthWrapper(),
+            home: const SplashScreen(),
             debugShowCheckedModeBanner: false,
           );
         },

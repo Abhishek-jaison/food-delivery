@@ -46,23 +46,36 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
           statusBarIconBrightness: Brightness.light,
           statusBarBrightness: Brightness.dark,
         ),
-        child: Column(
+        child: Stack(
           children: [
+            // Background gradient header
             _buildHeader(),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: () => context.read<HomeDataProvider>().refreshData(),
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      _buildPromotionalBanner(),
-                      _buildRestaurantsSection(),
-                      SizedBox(height: 20.h),
-                    ],
+            // Content that overlaps the header
+            Column(
+              children: [
+                // Spacer to push content below status bar
+                SizedBox(
+                  height:
+                      MediaQuery.paddingOf(context).top +
+                      150.h, // Adjusted to work with fixed header height
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () =>
+                        context.read<HomeDataProvider>().refreshData(),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          _buildPromotionalBanner(),
+                          _buildRestaurantsSection(),
+                          SizedBox(height: 20.h),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
@@ -77,13 +90,14 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
         final user = authProvider.user;
 
         return Container(
+          height:
+              MediaQuery.paddingOf(context).top +
+              210.h, // Fixed height for header
           padding: EdgeInsets.only(
             left: 20.w,
             right: 20.w,
-            top:
-                MediaQuery.paddingOf(context).top +
-                16.h, // Add status bar height
-            bottom: 16.h,
+            top: MediaQuery.paddingOf(context).top + 16.h,
+            bottom: 12.h, // Back to normal padding
           ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -94,10 +108,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                 Color.fromRGBO(47, 52, 56, 0.79), // rgba(47, 52, 56, 0.79)
               ],
             ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20.r),
-              bottomRight: Radius.circular(20.r),
-            ),
+            borderRadius: BorderRadius.only(bottomLeft: Radius.circular(34.r)),
           ),
           child: Column(
             children: [
@@ -122,14 +133,21 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          user?.displayName ?? 'User',
+                          (user?.displayName ?? 'User')
+                              .split(' ')
+                              .map(
+                                (word) => word.isNotEmpty
+                                    ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+                                    : '',
+                              )
+                              .join(' '),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 4.h),
+                        // SizedBox(height: 4.h),
                         Row(
                           children: [
                             Icon(
@@ -218,7 +236,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
         return Column(
           children: [
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              margin: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 20.h),
               height: 160.h,
               child: PageView.builder(
                 controller: _bannerController,
@@ -239,12 +257,15 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                 homeProvider.banners.length,
                 (index) => Container(
                   margin: EdgeInsets.symmetric(horizontal: 4.w),
-                  width: homeProvider.currentBannerIndex == index ? 12.w : 8.w,
+                  width: homeProvider.currentBannerIndex == index
+                      ? 20.w
+                      : 8.w, // Selected dot is wider (20.w vs 8.w)
                   height: 8.h,
                   decoration: BoxDecoration(
                     color: homeProvider.currentBannerIndex == index
-                        ? Colors.orange
-                        : Colors.grey[400],
+                        ? Colors
+                              .black // Selected dot is black
+                        : Colors.grey[400], // Inactive dots remain grey
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                 ),
@@ -479,8 +500,8 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
+          topLeft: Radius.circular(40.r),
+          topRight: Radius.circular(40.r),
         ),
         boxShadow: [
           BoxShadow(
@@ -496,9 +517,9 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.home, 'Home', true),
-              _buildNavItem(Icons.shopping_bag_outlined, 'Orders', false),
-              _buildNavItem(Icons.person_outline, 'Profile', false),
+              _buildNavItem('assets/homeb.png', 'Home', true),
+              _buildNavItem('assets/cart b.png', 'Orders', false),
+              _buildNavItem('assets/progileb.png', 'Profile', false),
             ],
           ),
         ),
@@ -506,14 +527,15 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, bool isActive) {
+  Widget _buildNavItem(String imagePath, String label, bool isActive) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
+        Image.asset(
+          imagePath,
+          width: 24.w,
+          height: 24.h,
           color: isActive ? Colors.black : Colors.grey[600],
-          size: 24.sp,
         ),
         SizedBox(height: 4.h),
         Text(
@@ -532,38 +554,132 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Sign Out'),
-          content: Text('Are you sure you want to sign out?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                final authProvider = Provider.of<AuthProvider>(
-                  context,
-                  listen: false,
-                );
-                await authProvider.signOut();
-                if (context.mounted) {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ),
-                    (route) => false,
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.r),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color.fromRGBO(47, 52, 56, 1),
+                  Color.fromRGBO(47, 52, 56, 0.9),
+                ],
               ),
-              child: Text('Sign Out'),
             ),
-          ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.logout_rounded,
+                    color: Colors.red,
+                    size: 32.sp,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+
+                // Title
+                Text(
+                  'Sign Out',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+
+                // Message
+                Text(
+                  'Are you sure you want to sign out?',
+                  style: TextStyle(color: Colors.grey[300], fontSize: 16.sp),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 24.h),
+
+                // Buttons
+                Row(
+                  children: [
+                    // Cancel Button
+                    Expanded(
+                      child: Container(
+                        height: 48.h,
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.grey[400]!),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Colors.grey[300],
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+
+                    // Sign Out Button
+                    Expanded(
+                      child: Container(
+                        height: 48.h,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            final authProvider = Provider.of<AuthProvider>(
+                              context,
+                              listen: false,
+                            );
+                            await authProvider.signOut();
+                            if (context.mounted) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginScreen(),
+                                ),
+                                (route) => false,
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          child: Text(
+                            'Sign Out',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
