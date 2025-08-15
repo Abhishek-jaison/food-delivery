@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../providers/auth_provider.dart';
 import '../providers/home_data_provider.dart';
@@ -188,20 +187,42 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
           return SizedBox(height: 20.h);
         }
 
-        return Container(
-          margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-          height: 180.h,
-          child: PageView.builder(
-            controller: _bannerController,
-            onPageChanged: (index) {
-              homeProvider.updateBannerIndex(index);
-            },
-            itemCount: homeProvider.banners.length,
-            itemBuilder: (context, index) {
-              final banner = homeProvider.banners[index];
-              return _buildBannerCard(banner);
-            },
-          ),
+        return Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              height: 160.h,
+              child: PageView.builder(
+                controller: _bannerController,
+                onPageChanged: (index) {
+                  homeProvider.updateBannerIndex(index);
+                },
+                itemCount: homeProvider.banners.length,
+                itemBuilder: (context, index) {
+                  final banner = homeProvider.banners[index];
+                  return _buildBannerCard(banner);
+                },
+              ),
+            ),
+            // Dot indicators
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                homeProvider.banners.length,
+                (index) => Container(
+                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                  width: homeProvider.currentBannerIndex == index ? 12.w : 8.w,
+                  height: 8.h,
+                  decoration: BoxDecoration(
+                    color: homeProvider.currentBannerIndex == index
+                        ? Colors.orange
+                        : Colors.grey[400],
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -210,189 +231,15 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
   Widget _buildBannerCard(PromotionalBannerModel banner) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 4.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2C),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16.r)),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Row(
-        children: [
-          // Left side - Text content
-          Expanded(
-            flex: 3,
-            child: Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Logo placeholder
-                  Container(
-                    width: 40.w,
-                    height: 40.h,
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'LOGO',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    banner.subtitle,
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    banner.title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    banner.description,
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 8.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Text(
-                      banner.buttonText ?? 'ORDER NOW',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Right side - Image
-          Expanded(
-            flex: 2,
-            child: Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(16.r),
-                      bottomRight: Radius.circular(16.r),
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(16.r),
-                      bottomRight: Radius.circular(16.r),
-                    ),
-                    child: CachedNetworkImage(
-                      imageUrl: banner.imageUrl,
-                      fit: BoxFit.cover,
-                      height: double.infinity,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey[300],
-                        child: Icon(
-                          Icons.fastfood,
-                          color: Colors.grey[600],
-                          size: 40.sp,
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey[300],
-                        child: Icon(
-                          Icons.error,
-                          color: Colors.red,
-                          size: 40.sp,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Discount badge
-                if (banner.discountText != null)
-                  Positioned(
-                    top: 12.h,
-                    right: 12.w,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        banner.discountText!,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                // Contact info
-                Positioned(
-                  bottom: 8.h,
-                  right: 8.w,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      if (banner.phoneNumber != null)
-                        Text(
-                          banner.phoneNumber!,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 8.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      if (banner.website != null)
-                        Text(
-                          banner.website!,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 8.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        child: Image.asset(
+          banner.imageUrl,
+          fit: BoxFit.cover,
+          height: double.infinity,
+          width: double.infinity,
+        ),
       ),
     );
   }
@@ -480,25 +327,11 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                   topLeft: Radius.circular(12.r),
                   topRight: Radius.circular(12.r),
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: restaurant.imageUrl,
+                child: Image.asset(
+                  restaurant.imageUrl,
                   height: 160.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    height: 160.h,
-                    color: Colors.grey[300],
-                    child: Icon(
-                      Icons.restaurant,
-                      color: Colors.grey[600],
-                      size: 40.sp,
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 160.h,
-                    color: Colors.grey[300],
-                    child: Icon(Icons.error, color: Colors.red, size: 40.sp),
-                  ),
                 ),
               ),
 
