@@ -136,9 +136,22 @@ class AuthProvider extends ChangeNotifier {
   Future<void> signOut() async {
     _setLoading(true);
     try {
+      // Disconnect Google account if signed in with Google
+      if (isSignedInWithGoogle()) {
+        try {
+          await _googleSignIn.disconnect();
+        } catch (_) {
+          // Ignore errors, continue with signOut
+        }
+      }
       await _googleSignIn.signOut();
       await _firebaseService.signOut();
       await HiveService.clearAllCache();
+
+      // Double-check: If still signed in, try again
+      if (_firebaseService.currentUser != null) {
+        await _firebaseService.signOut();
+      }
     } catch (e) {
       _setError(e.toString());
     } finally {

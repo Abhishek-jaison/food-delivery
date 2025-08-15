@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "937335719775",
+    "firebase_url": "https://food-delivery-app-36d9f-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "food-delivery-app-36d9f",
     "storage_bucket": "food-delivery-app-36d9f.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.food_delivery"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "937335719775-hikmmckcvguno1ju2paddts9cqqftknf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.food_delivery",
+            "certificate_hash": "4b2ef4b3e95a6356398474c0226ec09aa8adc617"
+          }
+        },
+        {
+          "client_id": "937335719775-drcq52nr35sacq28h49cn4fos0631coq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDHi5bqCFxde4ipYuTQjoCNplcA2D_nVG0"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "937335719775-drcq52nr35sacq28h49cn4fos0631coq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

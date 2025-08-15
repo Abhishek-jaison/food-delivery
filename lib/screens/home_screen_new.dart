@@ -411,7 +411,9 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                       restaurant.isFavorite
                           ? Icons.favorite
                           : Icons.favorite_border,
-                      color: restaurant.isFavorite ? Colors.red : Colors.white,
+                      color: restaurant.isFavorite
+                          ? Colors.white
+                          : Colors.white,
                       size: 24.sp,
                     ),
                   ),
