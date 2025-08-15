@@ -7,6 +7,7 @@ import '../providers/home_data_provider.dart';
 import '../models/restaurant_model.dart';
 import '../models/promotional_banner_model.dart';
 import 'login_screen.dart';
+import 'package:flutter/services.dart';
 
 class HomeScreenNew extends StatefulWidget {
   const HomeScreenNew({super.key});
@@ -38,8 +39,13 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+      backgroundColor: Color.fromARGB(255, 235, 239, 240),
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
         child: Column(
           children: [
             _buildHeader(),
@@ -71,9 +77,23 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
         final user = authProvider.user;
 
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          padding: EdgeInsets.only(
+            left: 20.w,
+            right: 20.w,
+            top:
+                MediaQuery.paddingOf(context).top +
+                16.h, // Add status bar height
+            bottom: 16.h,
+          ),
           decoration: BoxDecoration(
-            color: const Color(0xFF2C2C2C),
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Color.fromRGBO(47, 52, 56, 1), // rgba(47, 52, 56, 1)
+                Color.fromRGBO(47, 52, 56, 0.79), // rgba(47, 52, 56, 0.79)
+              ],
+            ),
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(20.r),
               bottomRight: Radius.circular(20.r),
@@ -86,15 +106,13 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                 children: [
                   CircleAvatar(
                     radius: 20.r,
-                    backgroundColor: Colors.orange,
-                    child: Text(
-                      user?.displayName?.substring(0, 1).toUpperCase() ??
-                          user?.email?.substring(0, 1).toUpperCase() ??
-                          'U',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
+                    backgroundColor: Colors.transparent,
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/image.png',
+                        width: 40.w,
+                        height: 40.h,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
@@ -142,14 +160,19 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
 
               // Search Bar
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(25.r),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.search, color: Colors.grey[600], size: 20.sp),
+                    Image.asset(
+                      'assets/search.png',
+                      width: 20.w,
+                      height: 20.h,
+                      color: Colors.black,
+                    ),
                     SizedBox(width: 12.w),
                     Expanded(
                       child: TextField(
@@ -157,7 +180,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                         decoration: InputDecoration(
                           hintText: 'Type your cravings here..',
                           hintStyle: TextStyle(
-                            color: Colors.grey[600],
+                            color: Colors.grey[500],
                             fontSize: 16.sp,
                           ),
                           border: InputBorder.none,
@@ -169,7 +192,12 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                         },
                       ),
                     ),
-                    Icon(Icons.mic, color: Colors.grey[600], size: 20.sp),
+                    Image.asset(
+                      'assets/Microphone.png',
+                      width: 20.w,
+                      height: 20.h,
+                      color: Colors.black,
+                    ),
                   ],
                 ),
               ),
@@ -324,12 +352,12 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12.r),
-                  topRight: Radius.circular(12.r),
+                  topLeft: Radius.circular(16.r),
+                  topRight: Radius.circular(16.r),
                 ),
                 child: Image.asset(
                   restaurant.imageUrl,
-                  height: 160.h,
+                  height: 114.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -348,7 +376,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                   child: Container(
                     padding: EdgeInsets.all(8.w),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.transparent,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -362,10 +390,8 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                       restaurant.isFavorite
                           ? Icons.favorite
                           : Icons.favorite_border,
-                      color: restaurant.isFavorite
-                          ? Colors.red
-                          : Colors.grey[600],
-                      size: 20.sp,
+                      color: restaurant.isFavorite ? Colors.red : Colors.white,
+                      size: 24.sp,
                     ),
                   ),
                 ),
@@ -375,7 +401,10 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
 
           // Restaurant info
           Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 8.h,
+            ), // Reduced from 16.w to 8.h vertical padding
             child: Row(
               children: [
                 Expanded(
@@ -390,7 +419,6 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(height: 4.h),
                       Text(
                         restaurant.cuisine,
                         style: TextStyle(
@@ -400,6 +428,14 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                       ),
                     ],
                   ),
+                ),
+
+                // Vertical divider
+                Container(
+                  height: 17.h,
+                  width: 1.w,
+                  color: Colors.black,
+                  margin: EdgeInsets.symmetric(horizontal: 12.w),
                 ),
 
                 // Rating and delivery time
@@ -420,7 +456,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 2.h), // Reduced from 4.h to 2.h
                     Text(
                       '${restaurant.deliveryTime} min',
                       style: TextStyle(
